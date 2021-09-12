@@ -1,49 +1,33 @@
-let listArea = document.getElementById('albumsList');
-let photosArea = document.getElementById('pictures');
-let ul = document.getElementById('listSpace');
-let li = document.createElement('li');
-let albumIdx;
-let photosLink = 'https://jsonplaceholder.typicode.com/photos?albumId=id';
-let fullLink;
+let imgList = document.getElementById('container-img__list')
+let albumsList = document.getElementById('container-albums__list');
 
-function initFetch(fullLink) {
-  fetch(fullLink).then((data) => {
-    console.log(data);
-    return data.json();
-  }).then((data) => {
-    photosArea.innerHTML = data.map((pictures) => {
-      let img = `<img src=${pictures.url}/>`;
-      return img;
-    })
-  })
+async function getAlbumsList() {
+  let responseList = await fetch('http://jsonplaceholder.typicode.com/albums')
+  let resultAlbumsList = await responseList.json();
+  albumsList.innerHTML = resultAlbumsList.map((data) => {
+    return `<li value="${data.id}"> Id: ${data.id} Title: ${data.title}. UserId: ${data.userId}</li>`;
+  }).join('');
 };
 
-let albums = fetch('https://jsonplaceholder.typicode.com/albums')
-.then ((data) => {
-  console.log(data);
-  return data.json();
-})
-.then((data) =>{
-  ul.innerHTML = data.map((album) =>{
-    li = `<li>${album.title}</li>`;
-    return li;
-  }).join('');
-  initFetch('https://jsonplaceholder.typicode.com/photos?albumId=1');
-  ul.addEventListener('click', (e) => {
-    e.preventDefault();
-    let element = data.find((album) => album.title === e.target.textContent);
-    albumIdx = element.Id;
-    console.log(albumIdx);
-    fullLink = photosLink + albumIdx;
+getAlbumsList().then(() => getLogo());
 
-    initFetch(fullLink);
-  })
+async function getPhotos(id = 1) {
+  let responseAlbums = await fetch(`https://jsonplaceholder.typicode.com/photos?albumId=${id}`);
+  let resultAbums = await responseAlbums.json(); 
+  let out = '<div>';
+  for( let i in resultAbums ) {
+    out += `<li class="logo"><img src='${resultAbums[i].url}'</li>`
+  }
+  out += '</div>'
+  imgList.innerHTML = out;
+};
+
+albumsList.addEventListener('click', elem => {
+  let result = elem.target.value;
+    getPhotos(result);
 })
 
-// fetch('https://jsonplaceholder.typicode.com/albums')
-//   .then(r => r.json())
-//   .then(r => {
-//     const list = document.createElement('div');
+{/* //     const list = document.createElement('div');
 //     list.innerHTML = r.map(n => `
 //       <div class="item">
 //         <div>UserId: ${n.userId}</div>
@@ -53,4 +37,4 @@ let albums = fetch('https://jsonplaceholder.typicode.com/albums')
 //     `).join('');
 //     document.body.append(list);
 //   });
-
+ */}
